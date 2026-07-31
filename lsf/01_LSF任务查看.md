@@ -49,3 +49,32 @@ bjobs -l JOBID
 
 将 `JOBID` 替换为 `bjobs` 第一列的实际数字，不要原样输入单词 `JOBID`。
 
+## 4. 本次实操结果
+
+```text
+JOBID: 435535
+Status: RUN
+Queue: rhel8
+Mode: Interactive pseudo-terminal shell mode
+Submit host: srv244
+Execution host: srv120
+Requested/allocated slots: 4
+Eligible pending time: 1 second
+MEM: 25.8 Gbytes
+MAX MEM: 25.8 Gbytes
+AVG MEM: 8.6 Gbytes
+SWAP: 0 Mbytes
+NTHREAD: 95
+```
+
+关键解释：
+
+- `Interactive pseudo-terminal shell mode` 对应提交时的 `bsub -Is`。
+- `4 Task(s)` 和 `Allocated 4 Slot(s)` 对应 `bsub -n 4`；slot 是 LSF 分配单位，EDA 工具仍需自身启用并行才能有效使用这些资源。
+- 四个 slot 都显示在 `srv120`，说明本次任务集中运行在同一执行主机。
+- `CPU time` 是任务累计消耗的 CPU 时间，不等于从提交到当前的墙钟时间。
+- `MEM` 是本次采集时的内存使用信息，`MAX MEM` 和 `AVG MEM` 分别是已观测峰值与平均值。
+- `NTHREAD` 是任务进程的线程数量，不等于申请的 slot 数量，也不能据此认为获得了 95 个 CPU 核。
+- `SWAP: 0` 表示采集时没有使用交换空间。
+- Eligible pending time 只有 1 秒，说明任务很快获得了可运行资源。
+- `Resource requirement` 只显示默认的选择与排序条件，当前输出中没有看到显式内存资源要求。

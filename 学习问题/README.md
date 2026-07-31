@@ -8,7 +8,7 @@
 
 - [Tcl问题.md](Tcl问题.md)：Tcl 语法、List、控制流、过程及 EDA Tcl 问题。
 - [LSF问题.md](LSF问题.md)：任务提交、资源参数和状态判断问题。
-- Makefile 问题将在开始 Makefile 实操后创建。
+- [Makefile问题.md](Makefile问题.md)：目标、依赖、recipe 和执行顺序问题。
 
 ## 记录格式
 
