@@ -59,6 +59,30 @@ bjobs -a 436363
 
 检查最终状态。练习任务在 `sleep` 期间被终止时，输出文件通常已有 `START`、执行主机和开始时间，但不会出现任务命令中的 `END`。
 
+### FC 正常退出与运行中终止
+
+FC 空闲并停在 `fc_shell>` 提示符时，优先使用工具自身的 `exit` 正常退出。`stop_gui` 只关闭 GUI，不等于退出 `fc_shell`。如果当前设计允许编辑且确实需要保留修改，应按照项目 flow 在退出前使用规定的 `save_block`、`save_lib` 或 checkpoint；只读数据库和公共设计不能擅自保存。
+
+某条 FC 命令正在执行时：
+
+- 单次 `Ctrl+C` 会请求中断当前命令，命令响应后通常留在 `fc_shell`。
+- 如果正在执行 Tcl 脚本，被中断的命令之后的脚本内容不会继续执行。
+- 部分命令不能安全响应中断。
+- 在命令响应前连续按三次 `Ctrl+C` 可能直接终止 `fc_shell`，未保存数据不会保留。
+- 从另一个终端执行 `bkill JOBID` 属于系统层面终止，通常从上一个已保存 block/checkpoint 重新开始。
+
+中途终止前应确认：任务是否真的卡死、日志是否仍在更新、最后一个有效保存点、部分输出能否删除或覆盖、是否会影响共享文件，以及重新运行从哪个阶段开始。不要把中断后的半成品覆盖保存为正式数据库。
+
+### sleep 练习命令
+
+```bash
+sleep 600
+```
+
+表示进程等待 600 秒后正常返回。它几乎不使用 CPU，但 LSF Job 仍处于 `RUN`，申请的 slot 仍被占用；这与 LSF 的 `SUSP` 暂停状态不同。练习中使用 `sleep` 是为了让低负载测试任务保持足够久，便于观察 `bjobs` 和练习 `bkill`。
+
+如果在 `sleep` 期间执行 `bkill`，后面的 `echo END` 等命令不会执行；如果 Job 还处于 `PEND`，说明 `sleep` 尚未在执行主机开始。
+
 ## 4. 后台、`-I` 与 `-Is`
 
 不带交互选项时：
@@ -92,6 +116,34 @@ Interactive pseudo-terminal shell mode
 正是 `-Is` 的结果。
 
 【重点】交互方式改变的是终端连接方式，不会绕过队列调度；任务仍可能先处于 `PEND`。正常完成应使用程序自身的 `exit`/退出命令，卡死或无法响应时才从另一个终端使用 `bkill JOBID`。
+
+### 交互任务启动时出现环境警告
+
+本次复习执行：
+
+```bash
+bsub -Is -q rhel8 -n 1 /bin/bash
+```
+
+LSF 返回 Job `472084`，并显示 `Starting on srv83`。随后出现：
+
+```text
+ABRT has detected 1 problem(s).
+Can't locate local/lib.pm: Permission denied.
+BEGIN failed--compilation aborted.
+```
+
+但最终出现了 `srv83` 上的 Bash 提示符，因此 LSF 调度和 `/bin/bash` 启动已经成功。前两段信息来自执行主机的系统或用户 Shell 初始化过程：ABRT 表示该主机记录过系统问题；Perl 的 `local/lib.pm` 信息表示某段启动初始化尝试加载模块时失败。它们不一定影响当前交互 Shell。
+
+判断方法：
+
+```bash
+hostname
+echo $LSB_JOBID
+echo $0
+```
+
+如果能正常返回执行主机、Job ID 和 Shell 名称，并且有可用提示符，就说明交互任务可继续使用。不要为了消除主机级提示自行修改公共环境；若后续 EDA 工具因此无法启动，应保存完整输出并联系环境或 IT 管理人员。
 
 ## 5. `-M` 与内存资源申请
 

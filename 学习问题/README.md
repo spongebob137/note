@@ -9,6 +9,8 @@
 - [Tcl问题.md](Tcl问题.md)：Tcl 语法、List、控制流、过程及 EDA Tcl 问题。
 - [LSF问题.md](LSF问题.md)：任务提交、资源参数和状态判断问题。
 - [Makefile问题.md](Makefile问题.md)：目标、依赖、recipe 和执行顺序问题。
+- [FC问题.md](FC问题.md)：FC/CFlow 阶段运行、配置和报告问题。
+- [../fc实践](../fc实践/README.md)：FC/CFlow 实操期（Training Base run）的真实问题与状态判断方法。
 
 ## 记录格式
 

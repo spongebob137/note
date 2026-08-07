@@ -10,5 +10,8 @@
 - [Tcl](tcl/README.md)
 - [LSF](lsf/README.md)
 - [Makefile](makefile/README.md)
+- [FC/CFlow](fc/README.md)
+- [FC 实践问题](fc实践/README.md)
+- [当前学习接续卡（2026-08-04）](00_学习接续_2026-08-04.md)
 - [学习问题](学习问题/README.md)
 - [2026-07-31 工作日报](日报/2026-07-31_工作日报.md)
